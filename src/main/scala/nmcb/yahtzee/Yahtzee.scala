@@ -58,7 +58,7 @@ object Yahtzee:
           case (_, Pair(_))                       => -1
           case (OneOfAKind(l), OneOfAKind(r))     => l.compare(r)
 
-  type Outcome = (keep: Dices, cast: Dices)
+  type Outcome = (cast: Dices, chance: Double, value: Value, winning: Boolean)
 
   extension (dices: Dices)
 
@@ -95,7 +95,8 @@ object Yahtzee:
       else sys.error(s"unrecognized cast: $dices")
 
     def choices: Vector[Choice] =
-      val outcomes: Vector[Outcome] =
+      type Combination = (keep: Dices, cast: Dices)
+      val combinations: Vector[Combination] =
         for
           nr   <- (0 to 5).toVector
           keep <- dices.combinations(nr).map(_.sorted).distinct
@@ -103,26 +104,22 @@ object Yahtzee:
         yield
           (keep, cast)
 
-      outcomes
+      combinations
         .groupMap(_.keep)(_.cast)
         .toVector
         .map: (keep, casts) =>
           val chance  = 1.0 / casts.size
-          (keep, casts.map(cast => (cast, chance, (keep + cast).value, (keep + cast).value >= dices.value)))
+          keep -> casts.map: cast =>
+            val value   = (keep + cast).value
+            (cast, chance, value, value > dices.value)
         .sortBy(_._1.size)
 
 
-  extension (outcome: Outcome)
-
-    def value: Value =
-      (outcome.keep + outcome.cast).value
-
-  type Choice = (keep: Dices, casts: Vector[(Dices, Double, Value, Boolean)])
+  type Choice = (keep: Dices, casts: Vector[Outcome])
 
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     cast(5).map(_.value).sorted.foreach(println)
     "11122".choices.foreach(println)
-  }
 
 
