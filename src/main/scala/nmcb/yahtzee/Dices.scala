@@ -9,7 +9,14 @@ object Dice:
 
   given CanEqual[Dice, Dice] = derived
 
-  def apply(char: Char): Dice = char
+  def apply(char: Char): Dice =
+    assert(faces.contains(char), s"dice faces may be between '1' and '6', was: $char")
+    char
+
+  val faces: Vector[Dice] =
+    (0 until 6)
+      .map(side => ('1'.toInt + side).toChar)
+      .toVector
 
 
 opaque type Dices = String
@@ -18,11 +25,12 @@ object Dices:
 
   given CanEqual[Dices, Dices] = derived
 
-  /** Returns a normalized set of dices of given cast length */
-  def apply(cast: String): Dices =
-    assert(cast.nonEmpty && cast.length <= 5, s"cast length may be between 1 and 5 dices, was: ${cast.length}")
+  /** Returns a normalized set of dices from given string of [[Dice]] faces */
+  def apply(string: String): Dices =
+    assert(string.forall(Dice.faces.contains), s"dice faces may be between '1' and '6', was: $string")
+    assert(string.length <= 5, s"length may be maximally 5 dice faces, was: ${string.length}")
 
-    cast
+    string
       .countSame
       .toVector
       .map(_.swap)
@@ -30,17 +38,30 @@ object Dices:
       .flatMap((count, dice) => Vector.fill(count)(dice))
       .mkString("")
 
-  /** Returns a [[Vector]] of distinctly possible [[Dices]] casts after normalization for given [[nrOfDices]] */
-  def cast(nrOfDices: Int): Vector[Dices] =
-    assert(nrOfDices > 0 && nrOfDices <= 5, s"nr of dices cast may be between 1 and 5 dices, was: $nrOfDices")
-    (0 until 6)
-      .map(side => ('1'.toInt + side).toChar)
+  /** Returns a [[Vector]] of distinctly possible [[Dices]] cast after normalization for given [[nrOfDices]] */
+  def casts(nrOfDices: Int): Vector[Dices] =
+    assert(nrOfDices >= 0 && nrOfDices <= 5, s"nr of dices cast may be between 0 and 5 dices, was: $nrOfDices")
+
+    Dice
+      .faces
       .foldLeft("")((result, dice) => result + List.fill(nrOfDices)(dice).mkString(""))
       .combinations(nrOfDices)
+      .map(Dices.apply)
       .distinct
       .toVector
 
   extension (dices: Dices)
+
+    def +(others: Dices): Dices =
+      Dices(dices + others)
+
+    def nrOfDices: Int =
+      dices.length
+
+    /** Returns a [[scala.Vector]] of distinctly possible [[nrOfDices]] kept from these [[dices]] */
+    def keeps(nrOfDices: Int): Vector[Dices] =
+      assert(nrOfDices >= 0 && nrOfDices <= 5, s"nr of dices kept may be between 0 and 5 dices, was: $nrOfDices")
+      dices.combinations(nrOfDices).toVector
 
     def countSame: Map[Dice, Int] =
       dices.groupMapReduce(identity)(_ => 1)(_ + _)
