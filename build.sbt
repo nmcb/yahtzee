@@ -6,8 +6,7 @@ lazy val root = project
   .settings( name                 := "yahtzee"
            , version              := "0.1.0"
            , scalaVersion         := scala3Version
-           , libraryDependencies ++=
-               Seq("org.scalacheck" %% "scalacheck" % "1.19.0" % "test")
+           , libraryDependencies ++= Seq("org.scalatest"  %% "scalatest"  % "3.2.20" % "test")
            )
 
 ThisBuild / scalacOptions ++= Seq(
