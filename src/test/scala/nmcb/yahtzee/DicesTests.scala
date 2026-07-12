@@ -5,11 +5,15 @@ import org.scalatest.funsuite.AnyFunSuite
 class DicesTests extends AnyFunSuite:
 
   test("Dices.apply"):
+    // NOK faces
+    assertResult("assertion failed: dice faces may be between '1' and '6', was: 01234")(intercept[AssertionError](Dices("01234")).getMessage)
+    assertResult("assertion failed: dice faces may be between '1' and '6', was: 34567")(intercept[AssertionError](Dices("34567")).getMessage)
+
     // NOK length
-    assertResult("assertion failed: cast length may be between 1 and 5 dices, was: 0")(intercept[AssertionError](Dices("")).getMessage)
-    assertResult("assertion failed: cast length may be between 1 and 5 dices, was: 6")(intercept[AssertionError](Dices("123456")).getMessage)
+    assertResult("assertion failed: length may be maximally 5 dice faces, was: 6")(intercept[AssertionError](Dices("123456")).getMessage)
 
     // OK length
+    assertResult("")(Dices("").toString)
     assertResult("1")(Dices("1").toString)
     assertResult("21")(Dices("12").toString)
     assertResult("321")(Dices("123").toString)
@@ -20,17 +24,16 @@ class DicesTests extends AnyFunSuite:
     assertResult("22233")(Dices("32322").toString)
     assertResult("33322")(Dices("23233").toString)
 
-  test("Dices.cast"):
+  test("Dices.casts"):
     // NOK length
-    assertResult("assertion failed: nr of dices cast may be between 1 and 5 dices, was: 0")(intercept[AssertionError](Dices.cast(0)).getMessage)
-    assertResult("assertion failed: nr of dices cast may be between 1 and 5 dices, was: 6")(intercept[AssertionError](Dices.cast(6)).getMessage)
+    assertResult("assertion failed: nr of dices cast may be between 0 and 5 dices, was: 6")(intercept[AssertionError](Dices.casts(6)).getMessage)
 
     // OK length
-    assertResult(6)(Dices.cast(1).length)
-    assertResult(21)(Dices.cast(2).length)
-    assertResult(56)(Dices.cast(3).length)
-    assertResult(126)(Dices.cast(4).length)
-    assertResult(252)(Dices.cast(5).length)
+    assertResult(6)(Dices.casts(1).length)
+    assertResult(21)(Dices.casts(2).length)
+    assertResult(56)(Dices.casts(3).length)
+    assertResult(126)(Dices.casts(4).length)
+    assertResult(252)(Dices.casts(5).length)
 
   test("Dices.countSame"):
     assertResult(Map(
