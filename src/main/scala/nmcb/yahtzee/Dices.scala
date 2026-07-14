@@ -24,6 +24,7 @@ opaque type Dices = String
 object Dices:
 
   given CanEqual[Dices, Dices] = derived
+  given Ordering[Dices] = Ordering.by(identity)
 
   /** Returns a normalized set of dices from given string of [[Dice]] faces */
   def apply(string: String): Dices =
