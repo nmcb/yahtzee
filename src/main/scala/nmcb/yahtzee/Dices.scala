@@ -22,6 +22,8 @@ object Dice:
 opaque type Dices = String
 
 object Dices:
+  
+  val MaxNrOfDices = 5
 
   given CanEqual[Dices, Dices] = derived
   given Ordering[Dices] = Ordering.by(identity)
@@ -29,7 +31,7 @@ object Dices:
   /** Returns a normalized set of dices from given string of [[Dice]] faces */
   def apply(string: String): Dices =
     assert(string.forall(Dice.faces.contains), s"dice faces may be between '1' and '6', was: $string")
-    assert(string.length <= 5, s"length may be maximally 5 dice faces, was: ${string.length}")
+    assert(string.length <= MaxNrOfDices, s"length may be maximally $MaxNrOfDices dice faces, was: ${string.length}")
 
     string
       .countSame
@@ -41,7 +43,7 @@ object Dices:
 
   /** Returns a [[Vector]] of distinctly possible [[Dices]] cast after normalization for given [[nrOfDices]] */
   def casts(nrOfDices: Int): Vector[Dices] =
-    assert(nrOfDices >= 0 && nrOfDices <= 5, s"nr of dices cast may be between 0 and 5 dices, was: $nrOfDices")
+    assert(nrOfDices >= 0 && nrOfDices <= MaxNrOfDices, s"nr of dices cast may be between 0 and $MaxNrOfDices dices, was: $nrOfDices")
 
     Dice
       .faces
@@ -61,7 +63,7 @@ object Dices:
 
     /** Returns a [[scala.Vector]] of distinctly possible [[nrOfDices]] kept from these [[dices]] */
     def keeps(nrOfDices: Int): Vector[Dices] =
-      assert(nrOfDices >= 0 && nrOfDices <= 5, s"nr of dices kept may be between 0 and 5 dices, was: $nrOfDices")
+      assert(nrOfDices >= 0 && nrOfDices <= MaxNrOfDices, s"nr of dices kept may be between 0 and $MaxNrOfDices dices, was: $nrOfDices")
       dices.combinations(nrOfDices).toVector
 
     def countSame: Map[Dice, Int] =
