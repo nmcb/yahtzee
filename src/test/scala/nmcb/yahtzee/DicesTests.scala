@@ -42,12 +42,12 @@ class DicesTests extends AnyFunSuite:
       Dice('3') -> 1,
       Dice('4') -> 1,
       Dice('5') -> 1,
-    ))(Dices("12345").countSame)
+    ))(Dices("12345").count)
 
     assertResult(Map(
       Dice('2') -> 3,
       Dice('3') -> 2,
-    ))(Dices("23232").countSame)
+    ))(Dices("23232").count)
 
   test("Dices.has"):
     assertResult(false)(Dices("23456").has(Dices("1")))
