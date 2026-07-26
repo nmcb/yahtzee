@@ -55,6 +55,9 @@ object Dices:
 
   extension (dices: Dices)
 
+    def total: Int =
+      dices.map(_.asDigit).sum
+
     def +(others: Dices): Dices =
       Dices(dices + others)
 
