@@ -34,7 +34,7 @@ object Dices:
     assert(string.length <= MaxNrOfDices, s"length may be maximally $MaxNrOfDices dice faces, was: ${string.length}")
 
     string
-      .countSame
+      .count
       .toVector
       .map(_.swap)
       .sorted.reverse
@@ -66,17 +66,17 @@ object Dices:
       assert(nrOfDices >= 0 && nrOfDices <= MaxNrOfDices, s"nr of dices kept may be between 0 and $MaxNrOfDices dices, was: $nrOfDices")
       dices.combinations(nrOfDices).toVector
 
-    def countSame: Map[Dice, Int] =
+    def count: Map[Dice, Int] =
       dices.groupMapReduce(identity)(_ => 1)(_ + _)
       
     def has(others: Dices): Boolean =
-      val dicesCount  = dices.countSame
-      val othersCount = others.countSame
+      val dicesCount  = dices.count
+      val othersCount = others.count
       othersCount.forall((dice, count) => dicesCount.getOrElse(dice, 0) >= count)
     
-    def isThreeOfAKind: Boolean = dices.countSame.values.max >= 3
-    def isCarre: Boolean        = dices.countSame.values.max >= 4
-    def isYahtzee: Boolean      = dices.countSame.size == 1
-    def isFullHouse: Boolean    = dices.countSame.size == 2 && dices.countSame.values.max == 3 && dices.countSame.values.min == 2
+    def isThreeOfAKind: Boolean = dices.count.values.max >= 3
+    def isCarre: Boolean        = dices.count.values.max >= 4
+    def isYahtzee: Boolean      = dices.count.size == 1
+    def isFullHouse: Boolean    = dices.count.size == 2 && dices.count.values.max == 3 && dices.count.values.min == 2
     def isSmallStreet: Boolean  = dices.has("1234") || dices.has("2345") || dices.has("3456")
     def isLargeStreet: Boolean  = dices.has("12345") || dices.has("23456")
