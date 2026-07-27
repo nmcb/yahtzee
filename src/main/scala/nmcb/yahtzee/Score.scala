@@ -4,7 +4,7 @@ object Score:
 
   import Dices.*
 
-  enum ScoreType( val score: Dices => Int, val isValid: Dices => Boolean = _ => true):
+  enum ScoreType( val score: Dices => Int, val isValid: Dices => Boolean = _ => true) derives CanEqual:
     case Ones   extends ScoreType(_.count.get(Dice('1')).map(_ * 1).getOrElse(0))
     case Twos   extends ScoreType(_.count.get(Dice('2')).map(_ * 2).getOrElse(0))
     case Threes extends ScoreType(_.count.get(Dice('3')).map(_ * 3).getOrElse(0))
@@ -22,15 +22,20 @@ object Score:
 
   import ScoreType.*
 
-  val UpperScoreTypes: Set[ScoreType] =
+  private val UpperScoreTypes: Set[ScoreType] =
     Set(Ones, Twos, Threes, Fours, Fives, Sixes)
 
-  val LowerScoreTypes: Set[ScoreType] =
+  private val LowerScoreTypes: Set[ScoreType] =
     Set(ThreeOfAKind, Carre, FullHouse, SmallStreet, LargeStreet, Yahtzee, Change)
+
+  val start: Score =
+    Score(Map.empty)
 
 import Score.*
 
-case class Score(filled: Map[ScoreType, Dices]):
+case class Score(filled: Map[ScoreType, Dices]) derives CanEqual:
+
+  import Dices.*
 
   private def score(types: Set[ScoreType]): Int =
     filled
@@ -50,9 +55,10 @@ case class Score(filled: Map[ScoreType, Dices]):
   val totalGeneral: Int =
     totalUpper + totalBonus + totalLower
 
-  def free(dices: Dices): Set[Score] =
+  def next(dices: Dices): Vector[Score] =
+    assert(dices.nrOfDices == MaxNrOfDices, s"nr of dices must be $MaxNrOfDices dices, was: ${dices.nrOfDices}")
     ScoreType
       .values
       .filter(scoreType => !filled.contains(scoreType) && scoreType.isValid(dices))
       .map(scoreType => copy(filled = filled + (scoreType -> dices)))
-      .toSet
+      .toVector
